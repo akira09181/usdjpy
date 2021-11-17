@@ -1,0 +1,21 @@
+{% extends './base.html' %}
+{% block header %}
+<h1>結果は{{resultend}}円、{{bai}}倍</h1>
+{% endblock header %}
+{% block content %}
+<table border = '2'>
+<tr>
+<th>年月日</th>
+<th>日本円</th>
+<th>USD</th>
+</tr>
+{% for i in result %}
+<tr>
+<td>{{i.0}}</td>
+<td>{{i.1}}</td>
+<td>{{i.2}}</td>
+</tr>
+{% endfor %}
+</table>
+{% endblock content %}
+
