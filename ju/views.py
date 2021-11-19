@@ -14,7 +14,7 @@ def index(request):
     if c[0]['date'] == value[2].get_text():
         pass
     else:
-        for k in range(80):
+        for k in range(40):
             a = k+1
             response = requests.get(f'https://info.finance.yahoo.co.jp/history/?code=USDJPY%3DX&sy=2015&sm=8&sd=19&ey=2021&em=11&ed=17&tm=d&p= { a }')
             bs = BeautifulSoup(response.text,'html.parser')
