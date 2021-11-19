@@ -5,30 +5,11 @@ from bs4 import BeautifulSoup
 from .models import PastValue
 # Create your views here.
 def index(request):
-    lists=[]
+    
     c = PastValue.objects.all().values()
     
-    response = requests.get('https://info.finance.yahoo.co.jp/history/?code=USDJPY%3DX&sy=2015&sm=8&sd=19&ey=2021&em=11&ed=17&tm=d')
-    bs = BeautifulSoup(response.text,'html.parser')
-    value = bs.find_all('td')
-    if c[0]['date'] == value[2].get_text():
-        pass
-    else:
-        for k in range(40):
-            a = k+1
-            response = requests.get(f'https://info.finance.yahoo.co.jp/history/?code=USDJPY%3DX&sy=2015&sm=8&sd=19&ey=2021&em=11&ed=17&tm=d&p= { a }')
-            bs = BeautifulSoup(response.text,'html.parser')
-            value = bs.find_all('td')
-        
-        
-            for i in range(20):
-                li = []
-                for j in range(5):
-                    li.append(value[i*5+j+2].get_text())
-                b = PastValue(date=li[0],start=float(li[1]),high=float(li[2]),low=float(li[3]),end=float(li[4]))
-                b.save()
-                lists.append(li)
-    c = PastValue.objects.all().values()
+    
+    
     
     context={'lists':c}
     return render(request,'ju/index.html',context)
@@ -80,3 +61,20 @@ def sma(request):
     jpy=int(jpy)             
     context={'result':result,'resultend':resultend,'bai':bai,'jpy':jpy,'countbuy':countbuy,'countsell':countsell}
     return render(request,'ju/result.html',context)
+def update(request):
+    for k in range(80):
+        a = k+1
+        response = requests.get(f'https://info.finance.yahoo.co.jp/history/?code=USDJPY%3DX&sy=2015&sm=8&sd=19&ey=2021&em=11&ed=17&tm=d&p= { a }')
+        bs = BeautifulSoup(response.text,'html.parser')            
+        value = bs.find_all('td')
+        
+        
+        for i in range(20):
+            li = []
+            for j in range(5):
+                li.append(value[i*5+j+2].get_text())
+                b = PastValue(date=li[0],start=float(li[1]),high=float(li[2]),low=float(li[3]),end=float(li[4]))
+                b.save()
+    c = PastValue.objects.all().values()
+    context = {'lists':c}
+    return render(request,'ju/index.html',context)
