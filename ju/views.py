@@ -111,6 +111,8 @@ def breverse(request):
     deviation=0
     buyusd = 0
     buyjpy = 0
+    countbuy=0
+    countsell=0
     for i in range(len(a)):
         ave=0
         s=0
@@ -126,13 +128,16 @@ def breverse(request):
                 buyusd = jpy * val
                 jpy -= buyusd
                 usd += buyusd/a[i]['start']
+                countbuy+=1
             if ave+deviation*2 < a[i]['start']:
                 buyjpy = usd * val
                 jpy += buyjpy*a[i]['start']
                 usd -= buyjpy
+                countsell+=1
         results[i][0]=a[i]['date']
         results[i][1]=jpy
         results[i][2]=usd
     finalresult = int(jpy+usd*a[len(a)-1]['start'])
-    context = { 'result':results ,'resultend':finalresult}    
+    bai = finalresult/sjpy
+    context = { 'bai':bai,'result':results ,'resultend':finalresult,'countbuy':countbuy,'countsell':countsell}    
     return render(request,'ju/result.html',context)
