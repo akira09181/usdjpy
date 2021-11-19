@@ -62,7 +62,7 @@ def sma(request):
     context={'result':result,'resultend':resultend,'bai':bai,'jpy':jpy,'countbuy':countbuy,'countsell':countsell}
     return render(request,'ju/result.html',context)
 def update(request):
-    print('hello world')
+    f=0
     for k in range(80):
         a = k+1
         response = requests.get(f'https://info.finance.yahoo.co.jp/history/?code=USDJPY%3DX&sy=2015&sm=8&sd=19&ey=2021&em=11&ed=17&tm=d&p= { a }')
@@ -83,9 +83,15 @@ def update(request):
                     e= li[0][:4]+'-'+li[0][5:6]+'-'+li[0][7:9]
             else:
                 e = li[0][:4]+'-'+li[0][5:6]+'-'+li[0][7:8]
-            b = PastValue(date=e,start=float(li[1]),high=float(li[2]),low=float(li[3]),end=float(li[4]))
+            f = PastValue.objects.filter(date=e).count()
+            if f == 0:
+                b = PastValue(date=e,start=float(li[1]),high=float(li[2]),low=float(li[3]),end=float(li[4]))
+                b.save()
+            else:
                 
-            b.save()
+                break
+        if f==1:
+            break
     
     c = PastValue.objects.all().values().order_by('date').reverse()
     
