@@ -47,6 +47,8 @@ def sma(request):
     flag=0
     buyusd=0
     buyjpy=0
+    countbuy=0
+    countsell=0
     for i in range(len(c)):
         avs=0
         avl=0
@@ -62,16 +64,19 @@ def sma(request):
             buyusd = jpy*val
             jpy-=buyusd
             usd+=buyusd/float(c[i]['start'])
+            countbuy+=1
         if avs < avl and flag==1:
             flag = 0
             buyjpy = usd*val
             usd -= buyjpy
             jpy += float(c[i]['start'])*buyjpy
+            countsell+=1
+            
         result[i][0]=d[-i-1]['date']
         result[i][1]=jpy
         result[i][2]=usd
     resultend = int(usd*float(d[-1]['start'])+jpy)        
     bai = resultend/jp
     jpy=int(jpy)             
-    context={'result':result,'resultend':resultend,'bai':bai,'jpy':jpy}
+    context={'result':result,'resultend':resultend,'bai':bai,'jpy':jpy,'countbuy':countbuy,'countsell':countsell}
     return render(request,'ju/result.html',context)
