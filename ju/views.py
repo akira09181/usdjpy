@@ -29,7 +29,7 @@ def index(request):
                 b.save()
                 lists.append(li)
     c = PastValue.objects.all().values()
-    print(c)
+    
     context={'lists':c}
     return render(request,'ju/index.html',context)
 def sma(request):
