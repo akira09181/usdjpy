@@ -3,6 +3,7 @@ from django.http import HttpResponse
 import requests
 from bs4 import BeautifulSoup
 from .models import PastValue
+import math
 # Create your views here.
 def index(request):
     
@@ -97,3 +98,41 @@ def update(request):
     
     context = {'lists':c}
     return render(request,'ju/index.html',context)
+
+def breverse(request):
+    ml = int(request.GET['moveline'])
+    val = int(request.GET['val'])/100
+    sjpy = int(request.GET['startj'])
+    a = PastValue.objects.all().values().order_by('date')
+    jpy=sjpy
+    usd=0
+    results = [['',0,0] for i in range(len(a))]
+    ave=0
+    deviation=0
+    buyusd = 0
+    buyjpy = 0
+    for i in range(len(a)):
+        ave=0
+        s=0
+        if i > ml:
+            for j in range(ml):
+                ave+=a[i-j]['start']
+            ave/=ml
+            for j in range(ml):
+                s += (a[i-j]['start']-ave)**2
+            deviation = math.sqrt(s)/ml
+            print(deviation)
+            if ave-deviation*2 > a[i]['start']:
+                buyusd = jpy * val
+                jpy -= buyusd
+                usd += buyusd/a[i]['start']
+            if ave+deviation*2 < a[i]['start']:
+                buyjpy = usd * val
+                jpy += buyjpy*a[i]['start']
+                usd -= buyjpy
+        results[i][0]=a[i]['date']
+        results[i][1]=jpy
+        results[i][2]=usd
+    finalresult = int(jpy+usd*a[len(a)-1]['start'])
+    context = { 'result':results ,'resultend':finalresult}    
+    return render(request,'ju/result.html',context)
