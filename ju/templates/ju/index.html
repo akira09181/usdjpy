@@ -3,12 +3,16 @@
 <h1>JPY-USD TRADE</h2>
 {% endblock %}
 {% block content %}
+<h2>SMA</h2>
 <form action='/ju/sma'>
 <p>短い移動平均線：<input type='text' name='short'></p>
 <p>長い移動平均線：<input type="text" name='long'></p>
 <p>一回の取引量（％）：<input type="text" name="val"></p>
 <p>初期の投資額（JPY）：<input type="text" name="start"></p>
 <input type = 'submit' value="Simulation">
+</form>
+<form action = '/ju/update'>
+<input type = 'submit' value='更新する'> 
 </form>
 <table border='2'>
 <tr>

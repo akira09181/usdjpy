@@ -2,7 +2,7 @@ from django.db import models
 
 # Create your models here.
 class PastValue (models.Model):
-    date = models.CharField(max_length=100,primary_key=True)
+    date = models.DateField(primary_key=True)
     start = models.FloatField(max_length=100)
     high = models.FloatField(max_length=100)
     low = models.FloatField(max_length=100)
