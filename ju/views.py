@@ -4,21 +4,22 @@ import requests
 from bs4 import BeautifulSoup
 from .models import PastValue
 import math
+from .forms import Sma,BreForm
 # Create your views here.
 def index(request):
     
     c = PastValue.objects.all().values().order_by('date').reverse()
+    Bre = BreForm(request.GET)
     
     
-    
-    
-    context={'lists':c}
+    SmaForm = Sma(request.GET)
+    context={'lists':c,'Sma':SmaForm,'Bre':Bre}
     return render(request,'ju/index.html',context)
 def sma(request):
     sh = int(request.GET['short'])
     lo = int(request.GET['long'])
     val = int(request.GET['val'])/100
-    jp = int(request.GET['start'])
+    jp = int(request.GET['sjpy'])
     jpy=jp
     c = PastValue.objects.all().values().order_by('date').reverse()
     d = list(c)
@@ -85,12 +86,10 @@ def update(request):
             else:
                 e = li[0][:4]+'-'+li[0][5:6]+'-'+li[0][7:8]
             f = PastValue.objects.filter(date=e).count()
-            if f == 0:
-                b = PastValue(date=e,start=float(li[1]),high=float(li[2]),low=float(li[3]),end=float(li[4]))
-                b.save()
-            else:
-                
-                break
+            
+            b = PastValue(date=e,start=float(li[1]),high=float(li[2]),low=float(li[3]),end=float(li[4]))
+            b.save()
+            
         if f==1:
             break
     
@@ -102,7 +101,7 @@ def update(request):
 def breverse(request):
     ml = int(request.GET['moveline'])
     val = int(request.GET['val'])/100
-    sjpy = int(request.GET['startj'])
+    sjpy = int(request.GET['sjpy'])
     a = PastValue.objects.all().values().order_by('date')
     jpy=sjpy
     usd=0
@@ -123,7 +122,7 @@ def breverse(request):
             for j in range(ml):
                 s += (a[i-j]['start']-ave)**2
             deviation = math.sqrt(s)/ml
-            print(deviation)
+            
             if ave-deviation*2 > a[i]['start']:
                 buyusd = jpy * val
                 jpy -= buyusd
