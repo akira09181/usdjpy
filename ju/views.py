@@ -10,8 +10,6 @@ def index(request):
     
     c = PastValue.objects.all().values().order_by('date').reverse()
     Bre = BreForm(request.GET)
-    
-    
     SmaForm = Sma(request.GET)
     context={'lists':c,'Sma':SmaForm,'Bre':Bre}
     return render(request,'ju/index.html',context)
@@ -94,8 +92,9 @@ def update(request):
             break
     
     c = PastValue.objects.all().values().order_by('date').reverse()
-    
-    context = {'lists':c}
+    Bre = BreForm(request.GET)
+    SmaForm = Sma(request.GET)
+    context = {'lists':c,'Bre':Bre,'Sma':SmaForm}
     return render(request,'ju/index.html',context)
 
 def breverse(request):
@@ -140,3 +139,86 @@ def breverse(request):
     bai = finalresult/sjpy
     context = { 'bai':bai,'result':results ,'resultend':finalresult,'countbuy':countbuy,'countsell':countsell}    
     return render(request,'ju/result.html',context)
+
+def bbr(request):
+    mov = int(request.GET['moveline'])
+    val = int(request.GET['val'])/100
+    sjpy=int(request.GET['sjpy'])
+    jpy=sjpy
+    usd=0
+    ave=0
+    devi=0
+    c = PastValue.objects.all().values().order_by('date')
+    result = [["",0,0]for i in range(len(c))]
+    cb=0
+    cs=0
+    for i in range(len(c)):
+        ave=0
+        devi=0
+        if i >mov:
+            for j in range(mov):
+                ave+=float(c[i-j]['start'])
+            ave/=mov
+            for j in range(mov):
+                devi+=(ave-float(c[i-j]['start']))**2
+            devi=math.sqrt(devi)/mov
+            if ave-devi*2 > float(c[i]['start']):
+                buyusd = usd*val
+                jpy += buyusd*float(c[i]['start'])
+                usd-=buyusd
+                cs+=1
+            elif ave+devi*2 <float(c[i]['start']):
+                buyjpy = jpy*val
+                jpy-=buyjpy
+                usd+= buyjpy/c[i]['start']
+                cb+=1
+        result[i][0]=c[i]['date']
+        result[i][1]=jpy
+        result[i][2]=usd
+    end = int(jpy+usd*c[len(c)-1]['start'])
+    bai=end/sjpy
+    context={'result':result,'resultend':end,'bai':bai,'countbuy':cb,'countsell':cs}
+    return render(request,'ju/result.html',context)
+def rsi(request):
+    day = int(request.GET['moveline'])
+    val = int(request.GET['val'])/100
+    sjpy = int(request.GET['sjpy'])
+    jpy = sjpy
+    usd = 0
+    minus=0
+    plus=0
+    c = PastValue.objects.all().values().order_by('date')
+    result=[["",0,0]for i in range(len(c))]
+    bc=0
+    sc=0
+    a=0
+    for i in range(len(c)):
+        minus=0
+        plus=0
+        if day < i:
+            for j in range(day):
+                a = float(c[i-j-1]['start'])-float(c[i-j]['start'])
+                if a < 0:
+                    minus-=a
+                else:
+                    plus+=a
+            minus/=day
+            plus/=day
+            rsi=plus/(plus+minus)*100
+            if rsi < 30:
+                buyusd = jpy*val
+                jpy-=buyusd
+                usd+=buyusd/c[i]['start']
+                bc+=1
+            elif rsi > 70:
+                buyjpy=usd*val
+                jpy+=buyjpy*c[i]['start']
+                usd-=buyjpy
+                sc+=1
+        result[i][0]=c[i]['date']
+        result[i][1]=jpy
+        result[i][2]=usd
+    end = int(jpy+usd*c[len(c)-1]['start'])
+    bai = end/sjpy
+    context={'result':result,'resultend':end,'bai':bai,'countbuy':bc,'countsell':sc}
+    return render(request,'ju/result.html',context)     

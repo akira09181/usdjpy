@@ -6,7 +6,6 @@
 {% block content %}
 <h2>SMA</h2>
 <form action='/ju/sma' class='form'>
-{% csrf_token %}
 {% bootstrap_form Sma layout='horizontal' %}
 <button type = 'submit' class='btn btn-outline-primary'>Simulation</button>
 </form>
@@ -15,8 +14,19 @@
 {% bootstrap_form Bre layout='horizontal' %}
 <button type = "submit" class='btn btn-outline-primary'>Simulation</button>
 </form>
+<h2>BBAND順張り</h2>
+<form action = '/ju/bbr' class='form'>
+{% bootstrap_form Bre layout='horizontal' %}
+<button type = "submit" class='btn btn-outline-primary'>Simulation</button>
+</form>
+<h2>RSI</h2>
+70以上で売り、30以下で買いとします。
+<form action = 'rsi' class='form'>
+{% bootstrap_form Bre layout='horizontal' %}
+<button type = "submit" class='btn btn-outline-primary'>Simulation</button>
+</form>
 <form action = '/ju/update'>
-<input type = 'submit' value='更新する'> 
+<input type = 'submit' value='更新する'>
 </form>
 <table border='2'>
 <tr>
